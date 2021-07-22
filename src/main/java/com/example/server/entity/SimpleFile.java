@@ -15,7 +15,7 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Data
-@Table(name = "files", uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
+@Table(name = "files")
 public class SimpleFile {
 
 	@Id
