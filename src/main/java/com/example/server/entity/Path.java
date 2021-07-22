@@ -19,7 +19,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "paths", uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
+@Table(name = "paths", uniqueConstraints = @UniqueConstraint(columnNames = {"path"}))
 public class Path {
 
 	@Id
