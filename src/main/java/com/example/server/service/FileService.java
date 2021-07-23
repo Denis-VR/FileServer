@@ -2,8 +2,8 @@ package com.example.server.service;
 
 import com.example.server.dto.FileDto;
 import com.example.server.dto.FileType;
-import com.example.server.dto.PathResponse;
 import com.example.server.dto.PathDto;
+import com.example.server.dto.PathResponse;
 import com.example.server.entity.Path;
 import com.example.server.entity.SimpleFile;
 import com.example.server.repository.PathRepository;
@@ -12,12 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.example.server.utils.StringSplitter.compareStrings;
 
 @Slf4j
 @Service
@@ -73,10 +72,15 @@ public class FileService {
 	}
 
 	public List<FileDto> getFilesForPath(String path) {
-		return pathRepository.findByPath(path).map(value ->
-				fileRepository.getSortedFilesByPath(value.getId()).stream()
-				.map(file -> new FileDto(file.getName(), determineSize(file)))
-				.collect(Collectors.toList())).orElse(null);
+		return pathRepository.findByPath(path).map(
+				path1 -> path1.getFiles().stream()
+						.sorted((file1, file2) -> {
+							if (file1.getFileType() != file2.getFileType()) {
+								return file1.getFileType() == FileType.DIRECTORY ? -1 : 1;
+							} else return compareStrings(file1.getName().toLowerCase(), file2.getName().toLowerCase());
+						})
+						.map(file -> new FileDto(file.getName(), determineSize(file)))
+						.collect(Collectors.toList())).orElse(null);
 	}
 
 	public String determineSize(SimpleFile file) {
@@ -87,17 +91,17 @@ public class FileService {
 	}
 
 	public String determineSize(long size) {
-		if (size >= 1024*1024) return getFileSizeMegaBytes(size);
+		if (size >= 1024 * 1024) return getFileSizeMegaBytes(size);
 		else if (size >= 1024) return getFileSizeKiloBytes(size);
 		else return getFileSizeBytes(size);
 	}
 
 	private static String getFileSizeMegaBytes(long size) {
-		return String.format("%.2f", (double) size/(1024*1024))+" mb";
+		return String.format("%.2f", (double) size / (1024 * 1024)) + " mb";
 	}
 
 	private static String getFileSizeKiloBytes(long size) {
-		return String.format("%.2f",(double) size/1024) + " kb";
+		return String.format("%.2f", (double) size / 1024) + " kb";
 	}
 
 	private static String getFileSizeBytes(long size) {
