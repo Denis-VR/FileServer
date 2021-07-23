@@ -36,4 +36,9 @@ public class FileController {
 	public ResponseEntity<List<FileDto>> getFilesForPath(String path) {
 		return new ResponseEntity<>(fileService.getFilesForPath(path), HttpStatus.OK);
 	}
+
+	@GetMapping("/fileExist")
+	public ResponseEntity<Boolean> checkFileExist(String path) {
+		return new ResponseEntity<>(fileService.pathExist(path), HttpStatus.OK);
+	}
 }

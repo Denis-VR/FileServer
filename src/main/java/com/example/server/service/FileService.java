@@ -107,4 +107,8 @@ public class FileService {
 	private static String getFileSizeBytes(long size) {
 		return size + " bytes";
 	}
+
+	public Boolean pathExist(String path) {
+		return pathRepository.findByPath(path).isPresent();
+	}
 }
